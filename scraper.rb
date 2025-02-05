@@ -1,9 +1,30 @@
 require 'nokogiri'
 require 'open-uri'
 require 'sqlite3'
+require 'logger'
+require 'uri'
 
-# Initialize the SQLite database
-db = SQLite3::Database.new "development_applications.db"
+# Initialize the logger
+logger = Logger.new(STDOUT)
+
+# Define the URL of the page
+url = 'https://www.bodc.tas.gov.au/council/advertised-development-applications/'
+
+# Step 1: Fetch the iframe content using open-uri
+begin
+  logger.info("Fetching iframe content from: #{url}")
+  iframe_html = open(url).read
+  logger.info("Successfully fetched iframe content.")
+rescue => e
+  logger.error("Failed to fetch iframe content: #{e}")
+  exit
+end
+
+# Step 2: Parse the iframe content using Nokogiri
+doc = Nokogiri::HTML(url)
+
+# Step 3: Initialize the SQLite database
+db = SQLite3::Database.new "data.sqlite"
 
 # Create the table if it doesn't exist
 db.execute <<-SQL
@@ -20,13 +41,6 @@ db.execute <<-SQL
     document_description TEXT
   );
 SQL
-
-# Define the URL of the page
-url = 'https://www.bodc.tas.gov.au/council/advertised-development-applications/'
-
-# Fetch and parse the HTML content
-html = URI.open(url)
-doc = Nokogiri::HTML(html)
 
 # Define variables for storing extracted data for each entry
 address = ''  
