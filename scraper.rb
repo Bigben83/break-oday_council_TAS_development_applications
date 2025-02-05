@@ -31,6 +31,7 @@ db.execute <<-SQL
   CREATE TABLE IF NOT EXISTS breakoday (
     id INTEGER PRIMARY KEY,
     description TEXT,
+    date_scraped TEXT,
     date_received TEXT,
     on_notice_to TEXT,
     address TEXT,
@@ -54,6 +55,7 @@ owner = ''
 stage_description = ''
 stage_status = ''
 document_description = ''
+date_scraped = ''
 
 
 # Step 4: Find the table inside the main div
@@ -76,14 +78,15 @@ table.css('tr').each do |row|
   pdf_link = columns[3].css('a').first['href'] rescue nil
   # Extract the text between the <a> tags (this is the council_reference)
   council_reference = columns[3].css('a').text.strip rescue nil
+  date_scraped = Date.today.to_s
 
   # Step 6: Ensure the entry does not already exist before inserting
   existing_entry = db.execute("SELECT * FROM breakoday WHERE council_reference = ?", [council_reference])
 
   if existing_entry.empty? # Only insert if the entry doesn't already exist
     # Insert the data into the database
-    db.execute("INSERT INTO breakoday (description, address, on_notice_to, document_description, council_reference) VALUES (?, ?, ?, ?, ?)",
-             [description, address, on_notice_to, pdf_link, council_reference])
+    db.execute("INSERT INTO breakoday (description, address, on_notice_to, document_description, council_reference, date_scraped) VALUES (?, ?, ?, ?, ?, ?)",
+             [description, address, on_notice_to, pdf_link, council_reference, date_scraped])
     logger.info("Data for application #{council_reference} saved to database.")
   else
     logger.info("Duplicate entry for application #{council_reference} found. Skipping insertion.")
