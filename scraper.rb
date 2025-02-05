@@ -58,27 +58,29 @@ document_description = ''
 date_scraped = ''
 
 
-# Step 4: Find the table inside the main div
-table = doc.at_css('div.main table') # Adjusted selector to find the table inside div.main
-if table.nil?
-  logger.error("Table not found inside div.main. Check if the table exists or if there is an issue with the selector.")
-  exit
-end
+# Step 4: Iterate through each application block and extract the data
+doc.css('div.card-body').each do |application|
+  # Extract data from the rows in the table
+  application_details = {}
+  
+  # Extract the table
+  table = application.at_css('table.table')
+  
+  if table
+    table.css('tbody tr').each do |row|
+      # Extract the label (the first column) and value (the second column)
+      label = row.at_css('td:nth-child(1)').text.strip
+      value = row.at_css('td:nth-child(2)').text.strip
 
-# Step 5: Iterate through each row in the table
-table.css('tr').each do |row|
-  # Extract the columns
-  columns = row.css('td')
-  next if columns.empty? # Skip rows without data
+      # Log the extracted label and value
+      logger.info("Row Label: #{label}, Value: #{value}")
 
-  # Extract the text content of each column
-  description = columns[0].text.strip
-  address = columns[1].text.strip
-  on_notice_to = columns[2].text.strip
-  pdf_link = columns[3].css('a').first['href'] rescue nil
-  # Extract the text between the <a> tags (this is the council_reference)
-  council_reference = columns[3].css('a').text.strip rescue nil
-  date_scraped = Date.today.to_s
+      # Store the data in the application_details hash
+      application_details[label] = value
+    end
+
+    # Log the full extracted data for debugging
+    logger.info("Full Application Details: #{application_details}")
 
   # Step 6: Ensure the entry does not already exist before inserting
   existing_entry = db.execute("SELECT * FROM breakoday WHERE council_reference = ?", [council_reference])
