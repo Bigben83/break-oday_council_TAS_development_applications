@@ -23,8 +23,8 @@ end
 # Step 2: Parse the iframe content using Nokogiri
 doc = Nokogiri::HTML(url)
 
-# Print the raw HTML to verify that the table is present
-logger.info("HTML Content: #{doc.to_html}")
+# Print out a snippet of the HTML for debugging
+logger.info("HTML Content snippet: #{doc.to_html[0..500]}")
 
 # Step 3: Initialize the SQLite database
 db = SQLite3::Database.new "data.sqlite"
@@ -57,12 +57,10 @@ stage_status = ''
 document_description = ''
 
 
-# Step 4: Find the table containing the development applications
-table = doc.at_css('table') # Adjust the selector as needed
-
-# If table is nil, log a message and exit
+# Step 4: Find the table inside the main div
+table = doc.at_css('div.main table') # Adjusted selector to find the table inside div.main
 if table.nil?
-  logger.error("Could not find the table element on the page.")
+  logger.error("Table not found inside div.main. Check if the table exists or if there is an issue with the selector.")
   exit
 end
 
