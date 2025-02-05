@@ -13,7 +13,7 @@ url = 'https://www.bodc.tas.gov.au/council/advertised-development-applications/'
 # Step 1: Fetch the iframe content using open-uri
 begin
   logger.info("Fetching content from: #{url}")
-  iframe_html = open(url).read
+  url = open(url).read
   logger.info("Successfully fetched content.")
 rescue => e
   logger.error("Failed to fetch content: #{e}")
@@ -22,6 +22,9 @@ end
 
 # Step 2: Parse the iframe content using Nokogiri
 doc = Nokogiri::HTML(url)
+
+# Print the raw HTML to verify that the table is present
+logger.info("HTML Content: #{doc.to_html}")
 
 # Step 3: Initialize the SQLite database
 db = SQLite3::Database.new "data.sqlite"
@@ -54,10 +57,16 @@ stage_status = ''
 document_description = ''
 
 
-# Find the table containing the development applications
+# Step 4: Find the table containing the development applications
 table = doc.at_css('table') # Adjust the selector as needed
 
-# Iterate through each row in the table
+# If table is nil, log a message and exit
+if table.nil?
+  logger.error("Could not find the table element on the page.")
+  exit
+end
+
+# Step 5: Iterate through each row in the table
 table.css('tr').each do |row|
   # Extract the columns
   columns = row.css('td')
