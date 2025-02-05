@@ -12,11 +12,11 @@ url = 'https://www.bodc.tas.gov.au/council/advertised-development-applications/'
 
 # Step 1: Fetch the iframe content using open-uri
 begin
-  logger.info("Fetching iframe content from: #{url}")
+  logger.info("Fetching content from: #{url}")
   iframe_html = open(url).read
-  logger.info("Successfully fetched iframe content.")
+  logger.info("Successfully fetched content.")
 rescue => e
-  logger.error("Failed to fetch iframe content: #{e}")
+  logger.error("Failed to fetch content: #{e}")
   exit
 end
 
