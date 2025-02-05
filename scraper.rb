@@ -74,10 +74,13 @@ table.css('tr').each do |row|
   address = columns[1].text.strip
   on_notice_to = columns[2].text.strip
   pdf_link = columns[3].css('a').first['href'] rescue nil
+  # Extract the text between the <a> tags (this is the council_reference)
+  council_reference = columns[3].css('a').text.strip rescue nil
+
 
   # Insert the data into the database
-  db.execute("INSERT INTO breakoday (description, address, on_notice_to, document_description) VALUES (?, ?, ?, ?)",
-             [description, address, on_notice_to, pdf_link])
+  db.execute("INSERT INTO breakoday (description, address, on_notice_to, document_description, council_reference) VALUES (?, ?, ?, ?, ?)",
+             [description, address, on_notice_to, pdf_link, council_reference])
 end
 
 puts "Data has been successfully inserted into the database."
