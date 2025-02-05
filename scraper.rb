@@ -32,6 +32,7 @@ db.execute <<-SQL
     id INTEGER PRIMARY KEY,
     description TEXT,
     date_received TEXT,
+    on_notice_to TEXT,
     address TEXT,
     council_reference TEXT,
     applicant TEXT,
@@ -45,6 +46,7 @@ SQL
 # Define variables for storing extracted data for each entry
 address = ''  
 description = ''
+on_notice_to = ''
 date_received = ''
 council_reference = ''
 applicant = ''
@@ -70,12 +72,12 @@ table.css('tr').each do |row|
   # Extract the text content of each column
   description = columns[0].text.strip
   address = columns[1].text.strip
-  closing_date = columns[2].text.strip
+  on_notice_to = columns[2].text.strip
   pdf_link = columns[3].css('a').first['href'] rescue nil
 
   # Insert the data into the database
-  db.execute("INSERT INTO breakoday (description, address, closing_date, document_description) VALUES (?, ?, ?, ?)",
-             [description, address, closing_date, pdf_link])
+  db.execute("INSERT INTO breakoday (description, address, on_notice_to, document_description) VALUES (?, ?, ?, ?)",
+             [description, address, on_notice_to, pdf_link])
 end
 
 puts "Data has been successfully inserted into the database."
