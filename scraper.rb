@@ -71,14 +71,14 @@ table.css('tr').each do |row|
   next if columns.empty? # Skip rows without data
 
   # Extract the text content of each column
-  name = columns[0].text.strip
+  description = columns[0].text.strip
   address = columns[1].text.strip
   closing_date = columns[2].text.strip
   pdf_link = columns[3].css('a').first['href'] rescue nil
 
   # Insert the data into the database
-  db.execute("INSERT INTO applications (name, address, closing_date, document_description) VALUES (?, ?, ?, ?)",
-             [name, address, closing_date, pdf_link])
+  db.execute("INSERT INTO breakoday (description, address, closing_date, document_description) VALUES (?, ?, ?, ?)",
+             [description, address, closing_date, pdf_link])
 end
 
 puts "Data has been successfully inserted into the database."
